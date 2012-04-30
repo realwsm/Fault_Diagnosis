@@ -1,6 +1,8 @@
-#include "fillcontent.h"
+#include "file_content.h"
 
 int main() {
+    
+#if 0    
     fillcontent *newconfig = creatfillcontentobject();
     //std::string path("D:\\temp\\data.txt");
     //newconfig.loadfile(path);
@@ -11,6 +13,7 @@ int main() {
     //newconfig.loadnewfile(path);
     //newconfig.printnewcontent();
     //std::string path("/home/w/data");
+
     std::string path("/media/share/tmp/data/");
   
     newconfig->readforder(path);
@@ -19,5 +22,7 @@ int main() {
     //newconfig->printnewcontent();
 
     destroyfillcontentobject(newconfig);
+#endif
+    
     return 0;
 }
