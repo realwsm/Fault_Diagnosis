@@ -37,43 +37,57 @@ API void GetFileName(const std::string &filePath, std::string &fileName) throw (
     return;
 }
 
-API bool splitfilename(const std::string &filename, std::vector<std::string> &result) {
-    if (filename.size() == 0) {
-        return false;
+API void SplitFileName(const std::string &fileName, std::vector<std::string> &result) throw (ParameterErrorException)
+{
+    if (fileName.size() == 0)
+    {
+        throw ParameterErrorException();
     }
-    char *newpath = new char[filename.size() + 1];
-    std::strcpy(newpath, filename.c_str());
+    
+    char *newPath = new char[fileName.size() + 1];
+    std::strcpy(newPath, fileName.c_str());
     result.clear();
-    char *cfaultname, *cgroupname, *cpointname, *cdatastr, *cdate;
-    do {
-        if ((cfaultname = std::strtok(newpath, "[")) == NULL) {
+    char *cFaultName = 0, *cGroupName = 0, *cPointName = 0, *cDataStr = 0, *cDate = 0;
+    
+    do
+    {
+        if ((cFaultName = std::strtok(newPath, "[")) == 0)
+        {
             break;
         }
-        if ((cgroupname = std::strtok(NULL, "]")) == NULL) {
+        
+        if ((cGroupName = std::strtok(0, "]")) == 0)
+        {
             break;
         }
-        char *test = std::strtok(NULL, "-");
-        if ((cpointname = std::strtok(test, "_")) == NULL) {
+        
+        char *test = std::strtok(0, "-");
+        
+        if ((cPointName = std::strtok(test, "_")) == 0)
+        {
             break;
         }
-        if ((cdatastr = std::strtok(NULL, "_")) == NULL) {
+        
+        if ((cDataStr = std::strtok(0, "_")) == 0)
+        {
             break;
         }
-        if ((cdate = std::strtok(NULL, ".")) == NULL) {
+        
+        if ((cDate = std::strtok(0, ".")) == 0)
+        {
             break;
         }
 
-        result.push_back(std::string(cfaultname));
-        result.push_back(std::string(cgroupname));
-        result.push_back(std::string(cpointname));
-        result.push_back(std::string(cdatastr));
-        result.push_back(std::string(cdate));
-        delete [] newpath;
-        return true;
+        result.push_back(std::string(cFaultName));
+        result.push_back(std::string(cGroupName));
+        result.push_back(std::string(cPointName));
+        result.push_back(std::string(cDataStr));
+        result.push_back(std::string(cDate));
+
     } while (0);
 
-    delete [] newpath;
-    return false;
+    delete [] newPath;
+    return;
 }
 
 /**
@@ -104,7 +118,7 @@ inline bool CheckSuffix(const char * targetFileName) throw()
  **/
 struct CompStr
 {
-    bool operator() (const std::string &str1, const std::string &str2)
+    bool operator() (const std::string &str1, const std::string &str2) throw()
     {
         return str1.compare(str2) <= 0;
     }
@@ -112,6 +126,7 @@ struct CompStr
 
 #ifdef WIN32
 void ReadWinForder(const std::string &forderPath, std::vector<std::string> &fileNames)
+        throw (ReadForderException)
 {
     fileNames.clear();
     std::string szFind = forderPath, newPath = forderPath;
@@ -172,12 +187,12 @@ void ReadUnwinForder(const std::string &forderPath, std::vector<std::string> &fi
         newPath.push_back('/');
     }
     
-    if ((dp = opendir(newPath.c_str())) == NULL)
+    if ((dp = opendir(newPath.c_str())) == 0)
     {
         throw ReadForderException();
     }
     
-    while ((dirp = readdir(dp)) != NULL)
+    while ((dirp = readdir(dp)) != 0)
     {
         std::string temppath = newPath + dirp->d_name;
         
@@ -200,7 +215,9 @@ void ReadUnwinForder(const std::string &forderPath, std::vector<std::string> &fi
 }
 #endif
 
-void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames) {
+void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames)
+        throw (ParameterErrorException, ReadForderException)
+{
     if (forderPath.size() == 0) {
         throw ParameterErrorException();
     }
@@ -208,8 +225,10 @@ void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNam
     fileNames.clear();
 
 #ifdef WIN32
-    return ReadWinForder(forderPath, fileNames);  
+    ReadWinForder(forderPath, fileNames);  
 #else
-    return ReadUnwinForder(forderPath, fileNames);
+    ReadUnwinForder(forderPath, fileNames);
 #endif
+    
+    return;
 }

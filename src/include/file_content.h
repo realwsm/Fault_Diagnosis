@@ -38,7 +38,7 @@ extern "C" {
     
 API void GetFileName(const std::string &filePath, std::string &fileName) throw (ParameterErrorException);
     
-API void SplitFileName(const std::string &fileName, std::vector<std::string> &result);
+API void SplitFileName(const std::string &fileName, std::vector<std::string> &result) throw (ParameterErrorException);
 
 
 /**
@@ -51,7 +51,8 @@ API void SplitFileName(const std::string &fileName, std::vector<std::string> &re
  * RETURN
  * void
  **/
-API void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames);
+API void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames)
+        throw (ParameterErrorException, ReadForderException);
 
 
 /**

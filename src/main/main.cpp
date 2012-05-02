@@ -1,3 +1,4 @@
+#include <iostream>
 #include "file_content.h"
 
 int main() {
@@ -23,6 +24,14 @@ int main() {
 
     destroyfillcontentobject(newconfig);
 #endif
+
+    std::vector<std::string> result;
+    SplitFileName("V9OPEN[3]-U26.2_data_201007221742.out", result);
+
+    for (std::vector<std::string>::iterator it = result.begin(); it != result.end(); ++it)
+    {
+        std::cout << *it << std::endl;
+    }
     
     return 0;
 }
