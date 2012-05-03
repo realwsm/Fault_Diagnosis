@@ -20,6 +20,15 @@ public:
     }
 };
 
+class ReadContentException : public std::exception
+{
+public:
+    const char *what() const throw()
+    {
+        return "when read file, it occurs error!";
+    }
+};
+
 #endif
 
 

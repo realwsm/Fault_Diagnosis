@@ -2,6 +2,7 @@
 #include<vector>
 #include<string>
 #include<algorithm>
+#include<fstream>
 
 #ifdef WIN32
 #include <atlstr.h>
@@ -231,4 +232,207 @@ void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNam
 #endif
     
     return;
+}
+
+inline void CheckDataSize(const double &tempData) throw (ReadContentException)
+{
+    if (static_cast<int>(tempData) < MIN_DATA_SIZE)
+    {
+        throw ReadContentException();
+    }
+
+    return;
+}
+
+static void FindMaxAndMIN(std::ifstream &ifs, const int fullDataSize, double &min, double &max)
+{
+    if (!ifs.good())
+    {
+        throw ParameterErrorException();
+    }
+    
+    std::streampos pos= ifs.tellg();
+
+    double tempData;
+    std::size_t count = 0;
+
+    if (ifs >> tempData)
+    {
+        min = max = tempData;
+        count++;
+    }
+    else
+    {
+        throw ParameterErrorException();
+    }
+    
+    while (ifs >> tempData)
+    {
+        if (tempData > max)
+        {
+            max = tempData;
+        }
+
+        if (tempData < min)
+        {
+            min = tempData;
+        }
+        
+        count++;
+    }
+
+    if (count != fullDataSize)
+    {
+        throw ParameterErrorException();
+    }
+    
+    ifs.clear();
+    
+    ifs.seekg(pos);
+    
+    return;
+}
+
+static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
+                                  const double max, const std::size_t maxReadSize)
+        throw (ParameterErrorException)
+{
+    if ((max - min) == 0)
+    {
+        return 0;
+    }
+    
+    if (max != 0.0 && (max - min) / max < 0.15)
+    {
+        return 0;
+    }
+
+    if ((max - min) / min < 0.15)
+    {
+        return 0;
+    }
+    
+    if (!ifs.good())
+    {
+        throw ParameterErrorException();
+    }
+
+    double tempData = 0.0;
+    std::size_t dataCount = 0;
+    
+    while (ifs >> tempData)
+    {
+        if (tempData - min < min * 0.15)
+        {
+            dataCount++;
+            break;
+        }
+        
+        dataCount++;
+    }
+
+    while (ifs >> tempData)
+    {
+        if (max - tempData > max * 0.15)
+        {
+            dataCount++;
+            break;
+        }
+
+        dataCount++;
+    }
+
+    if (dataCount > maxReadSize)
+    {
+        throw ReadContentException();
+    }
+    
+    return dataCount;
+}
+
+static inline std::size_t ReadOneGroup(std::ifstream &ifs, std::vector<double> &result)
+        throw (ParameterErrorException, ReadContentException)
+{
+    if (!ifs.is_open())
+    {
+        throw ParameterErrorException();
+    }
+
+    double tempData = 0.0;
+    std::size_t count = 0;
+    
+    for (;ifs >> tempData && count < READ_COUNT_OF_PER_GROUP; count++)
+    {
+        result.push_back(tempData);
+    }
+
+    if (count != READ_COUNT_OF_PER_GROUP)
+    {
+        throw ReadContentException();
+    }
+    
+    return count;
+}
+
+
+
+void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (ParameterErrorException, ReadContentException)
+{
+    if(fileName.length() == 0)
+    {
+        throw ParameterErrorException();
+    }
+
+    nodeContent.clearContent();
+
+    std::ifstream ifs(fileName.c_str());
+    
+    if (!ifs.is_open())
+    {
+        throw ReadContentException();
+    }
+
+    double tempData = 0.0;
+    std::size_t dataCount = 0;
+    int fullDataSize = 0;
+    std::streampos dataPos;
+    
+    while (ifs >> tempData)
+    {
+        if (dataCount == 0)
+        {
+            ++dataCount;
+            continue;
+        }
+        
+        if (dataCount == 1)
+        {
+            CheckDataSize(tempData);
+            fullDataSize = static_cast<int>(tempData);
+            ++dataCount;
+            break;
+        }
+    }
+
+    try
+    {
+        double min = 0.0, max = 0.0;
+
+        FindMaxAndMIN(ifs, fullDataSize, min, max);
+
+
+        for (std::size_t i = 0; i < READ_N_GROUP_DATA; i++)
+        {
+            std::vector<double> emptyV;
+            nodeContent.mValue.push_back(emptyV);
+            
+            dataCount += JumpToBoundary(ifs, min, max, (fullDataSize - dataCount - (READ_N_GROUP_DATA - i) * READ_COUNT_OF_PER_GROUP));   
+            dataCount += ReadOneGroup(ifs, *(nodeContent.mValue.end() - 1));
+        }
+    }
+    catch (std::exception &ex)
+    {
+        ifs.close();
+        throw ReadContentException();
+    }
 }

@@ -16,6 +16,10 @@
 #define API
 #endif
 
+const std::size_t READ_N_GROUP_DATA = 10;
+const std::size_t READ_COUNT_OF_PER_GROUP = 50;
+const std::size_t MIN_DATA_SIZE = 1000;
+
 /**
  * Define the type of one date file.
  **/
@@ -28,6 +32,12 @@ typedef struct Node {
      * n equal to mValue.size().
      **/
     std::vector< std::vector<double> > mValue;
+
+    void clearContent() throw()
+    {
+        std::vector< std::vector<double> > emptyContent;
+        mValue.swap(emptyContent);
+    }
 
     Node() : mGroup(0), mFaultNum(0) {}
 } NodeType;
@@ -63,7 +73,7 @@ API void ReadForder(const std::string &forderPath, std::vector<std::string> &fil
  * RETURN
  * void
  **/
-API void GetNodeContent(const std::string &fileName, NodeType &nodeContent);
+API void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (ParameterErrorException, ReadContentException);
     
 #ifdef __cplusplus
 }

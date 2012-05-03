@@ -25,6 +25,7 @@ int main() {
     destroyfillcontentobject(newconfig);
 #endif
 
+#if 0
     std::vector<std::string> result;
     SplitFileName("V9OPEN[3]-U26.2_data_201007221742.out", result);
 
@@ -32,6 +33,29 @@ int main() {
     {
         std::cout << *it << std::endl;
     }
+#endif
+
+    NodeType node;
+    GetNodeContent("/media/share/tmp/data/NORMAL[1]-Q2.E_data_201007210831.out", node);
+
+    for (std::vector< std::vector<double> >::iterator it = node.mValue.begin(); it != node.mValue.end(); it++)
+    {
+        for (std::vector<double>::iterator itn = (*it).begin(); itn != (*it).end(); itn++)
+        {
+            std::cout << "|" << *itn;
+        }
+        std::cout << "|" << std::endl;
+    }
     
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
