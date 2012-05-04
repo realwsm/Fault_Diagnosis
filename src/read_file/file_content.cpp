@@ -17,6 +17,10 @@
 
 #include "file_content.h"
 
+const std::size_t READ_N_GROUP_DATA = 10;
+const std::size_t READ_COUNT_OF_PER_GROUP = 50;
+const std::size_t MIN_DATA_SIZE = 1000;
+
 API void GetFileName(const std::string &filePath, std::string &fileName) throw (ParameterErrorException)
 {
     if (filePath.size() == 0) {
@@ -234,7 +238,7 @@ void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNam
     return;
 }
 
-inline void CheckDataSize(const double &tempData) throw (ReadContentException)
+static inline void CheckDataSize(const double &tempData) throw (ReadContentException)
 {
     if (static_cast<int>(tempData) < MIN_DATA_SIZE)
     {
@@ -244,16 +248,27 @@ inline void CheckDataSize(const double &tempData) throw (ReadContentException)
     return;
 }
 
+/* find the max and min data of the @ifs */
+
+/**
+ * find the max and min data of the @ifs
+ * PARAM
+ * @fullDataSize The second line of the file indict that the max data count of the file.
+ * 
+ **/
 static void FindMaxAndMIN(std::ifstream &ifs, const int fullDataSize, double &min, double &max)
 {
     if (!ifs.good())
     {
         throw ParameterErrorException();
     }
-    
+
+    /* In the end, it should reset the position. */
     std::streampos pos= ifs.tellg();
 
-    double tempData;
+    double tempData = 0.0;
+
+    /* In the function call, how much data it read */
     std::size_t count = 0;
 
     if (ifs >> tempData)
@@ -265,7 +280,8 @@ static void FindMaxAndMIN(std::ifstream &ifs, const int fullDataSize, double &mi
     {
         throw ParameterErrorException();
     }
-    
+
+    /* find the max and the min */
     while (ifs >> tempData)
     {
         if (tempData > max)
@@ -281,22 +297,28 @@ static void FindMaxAndMIN(std::ifstream &ifs, const int fullDataSize, double &mi
         count++;
     }
 
+    /* check the format of the file is correct or not */
     if (count != fullDataSize)
     {
         throw ParameterErrorException();
     }
     
     ifs.clear();
-    
+    /* reset the position */
     ifs.seekg(pos);
     
     return;
 }
 
+/**
+ * Set the Position to the first point of the next upper boundary.
+ **/
 static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
                                   const double max, const std::size_t maxReadSize)
         throw (ParameterErrorException)
 {
+    /* ----------------------------- */
+    /* when (max - min) / max < 0.15, the waveform is a straight line */
     if ((max - min) == 0)
     {
         return 0;
@@ -311,6 +333,7 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
     {
         return 0;
     }
+    /* -----------------------------*/
     
     if (!ifs.good())
     {
@@ -319,7 +342,8 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
 
     double tempData = 0.0;
     std::size_t dataCount = 0;
-    
+
+    /* skip the upper boundary */
     while (ifs >> tempData)
     {
         if (tempData - min < min * 0.15)
@@ -331,6 +355,7 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
         dataCount++;
     }
 
+    /* skip the lower boundary */
     while (ifs >> tempData)
     {
         if (max - tempData > max * 0.15)
@@ -342,6 +367,8 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
         dataCount++;
     }
 
+
+    /* reserve enough points for the next group.*/
     if (dataCount > maxReadSize)
     {
         throw ReadContentException();

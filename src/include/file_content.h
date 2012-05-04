@@ -16,9 +16,6 @@
 #define API
 #endif
 
-const std::size_t READ_N_GROUP_DATA = 10;
-const std::size_t READ_COUNT_OF_PER_GROUP = 50;
-const std::size_t MIN_DATA_SIZE = 1000;
 
 /**
  * Define the type of one date file.
@@ -45,11 +42,27 @@ typedef struct Node {
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-API void GetFileName(const std::string &filePath, std::string &fileName) throw (ParameterErrorException);
-    
-API void SplitFileName(const std::string &fileName, std::vector<std::string> &result) throw (ParameterErrorException);
 
+/**
+ * Get the file's name in the file's path
+ * PARAM
+ * @filePath file's path
+ * @fileName file's name
+ * RETURN
+ * void
+ **/    
+API void GetFileName(const std::string &filePath, std::string &fileName) throw (ParameterErrorException);
+
+
+/**
+ * Split the file'name into five fields.
+ * PARAM
+ * @fileName the target filename which is splited
+ * @result the five fields.
+ * RETURN
+ * void
+ **/    
+API void SplitFileName(const std::string &fileName, std::vector<std::string> &result) throw (ParameterErrorException);
 
 /**
  * Read the forder named @forderPath and get the name of the files
