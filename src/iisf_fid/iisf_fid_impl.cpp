@@ -43,13 +43,14 @@ void IisfFidWithKnn::ReadData(const std::string &forderPath)
         }
 
         std::size_t faultNum = mFaultName2FaultNum.size();
-        mFaultName2FaultNum.insert(std::map<std::string, int>::value_type(splitedFileName[0], faultNum));
+        std::pair<std::map<std::string, std::size_t>::iterator, bool> retFaultNum = 
+                mFaultName2FaultNum.insert(std::map<std::string, std::size_t>::value_type(splitedFileName[0], faultNum));
 
         std::pair<DataType::iterator, bool> ret = mFaults.insert(DataType::value_type(splitedFileName[0], PointType()));
         std::pair<PointType::iterator, bool> retPoint = ((ret.first)->second).insert(PointType::value_type(splitedFileName[2], std::list<NodeType>()));
         ((retPoint.first)->second).push_front(NodeType());
         ((retPoint.first)->second).begin()->mGroup = std::atoi(splitedFileName[1].c_str());
-        ((retPoint.first)->second).begin()->mFaultNum = faultNum;
+        ((retPoint.first)->second).begin()->mFaultNum = retFaultNum.first->second;
         ((retPoint.first)->second).begin()->mFilePath = *fnIt;
     }
 
@@ -393,7 +394,7 @@ static std::size_t Knn(const DataType &faults,
     {
         std::pair<std::map<std::size_t, std::size_t>::iterator, bool> ret = nearestNeighborAmount.insert(std::pair<std::size_t, std::size_t>(nDIt->mFaultNum, 1));
 
-        if (ret.second)
+        if (!ret.second)
         {
             (ret.first->second)++;
         }
@@ -405,7 +406,7 @@ static std::size_t Knn(const DataType &faults,
 }
 
 static void DiagnoseWithKnn(const DataType &faults,
-                            const std::map<std::size_t, std::string> faultNum2FaultName,
+                            const std::map<std::size_t, std::string> &faultNum2FaultName,
                             const std::string &key,
                             std::vector<std::string> &pointFaults)
 {
@@ -424,6 +425,9 @@ static void DiagnoseWithKnn(const DataType &faults,
             for (std::vector< std::vector<double> >::const_iterator vIt = ntIt->mValue.begin(); vIt != ntIt->mValue.end(); vIt++)
             {
                 std::size_t diagnoseResult = Knn(faults, key, trainingQuantity, *vIt);
+                std::cout << diagnoseResult << std::endl;
+                std::cout << faultNum2FaultName.find(diagnoseResult)->second << std::endl;
+                std::cout << dtIt->first << std::endl;
                 if (faultNum2FaultName.find(diagnoseResult)->second != dtIt->first)
                 {
                     state = false;
@@ -471,9 +475,12 @@ void IisfFidWithKnn::GetReducedPoint(const std::vector<AlphaType> &alphaWithPoin
 
         if (subFaultSet.size() == mFaults.size())
         {
+            std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
             return;
         }
     }
+
+    std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
 
     return;
 }
@@ -508,6 +515,23 @@ void IisfFidWithKnn::HandleData()
 #if 0
     std::cout << resultAlpha.size() << std::endl;
 #endif
+    std::cout << "----------mFaults------------" << std::endl;
+    for (DataType::iterator it = mFaults.begin(); it != mFaults.end(); it++)
+    {
+        std::cout << it->first << std::endl;
+    }
+
+    std::cout << "----------mFaults2Num-------" << std::endl;
+    for (std::map<std::string, std::size_t>::iterator it = mFaultName2FaultNum.begin(); it != mFaultName2FaultNum.end(); it++)
+    {
+        std::cout << it->first << " | " << it->second << std::endl;
+    }
+
+    std::cout << "----------mNum2Fault-----------" << std::endl;
+    for (std::map<std::size_t, std::string>::iterator it = mFaultNum2FaultName.begin(); it != mFaultNum2FaultName.end(); it++)
+    {
+        std::cout << it->first << " | " << it->second << std::endl;
+    }
     
     for (std::vector<double>::iterator it = resultD.begin(); it != resultD.end(); it++)
     {
