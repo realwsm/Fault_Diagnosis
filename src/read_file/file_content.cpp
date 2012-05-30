@@ -17,7 +17,7 @@
 
 #include "file_content.h"
 
-const std::size_t READ_N_GROUP_DATA = 10;
+const std::size_t READ_N_GROUP_DATA = 4;
 const std::size_t READ_COUNT_OF_PER_GROUP = 50;
 const std::size_t MIN_DATA_SIZE = 1000;
 
@@ -317,23 +317,31 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
                                   const double max, const std::size_t maxReadSize)
         throw (ParameterErrorException)
 {
+    double difference = max - min;
+
+    if (difference < 1.5)
+    {
+        return 0;
+    }
+#if 0    
     /* ----------------------------- */
     /* when (max - min) / max < 0.15, the waveform is a straight line */
     if ((max - min) == 0)
     {
         return 0;
     }
-    
+
     if (max != 0.0 && (max - min) / max < 0.15)
     {
         return 0;
     }
 
-    if ((max - min) / min < 0.15)
+    if (min != 0.0 && (max - min) / min < 0.15)
     {
         return 0;
     }
     /* -----------------------------*/
+#endif
     
     if (!ifs.good())
     {
@@ -346,7 +354,7 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
     /* skip the upper boundary */
     while (ifs >> tempData)
     {
-        if (tempData - min < min * 0.15)
+        if (tempData < (min + (difference * 0.15)))
         {
             dataCount++;
             break;
@@ -358,7 +366,7 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
     /* skip the lower boundary */
     while (ifs >> tempData)
     {
-        if (max - tempData > max * 0.15)
+        if (tempData > (max - (difference * 0.15)))
         {
             dataCount++;
             break;
@@ -462,4 +470,7 @@ void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (P
         ifs.close();
         throw ReadContentException();
     }
+
+    ifs.close();
+    return;
 }

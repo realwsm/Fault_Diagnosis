@@ -1,5 +1,6 @@
 #include <iostream>
 #include "file_content.h"
+#include "iisf_fid.h"
 
 int main() {
     
@@ -35,6 +36,7 @@ int main() {
     }
 #endif
 
+#if 0
     NodeType node;
     GetNodeContent("/media/share/tmp/data/NORMAL[1]-Q2.E_data_201007210831.out", node);
 
@@ -46,16 +48,10 @@ int main() {
         }
         std::cout << "|" << std::endl;
     }
-    
+#endif    
+    IisfFid * pIF = CreatIisfFidObject();
+    pIF->ReadData("/media/share/tmp/data/");
+    pIF->HandleData();
+    DestoryIisfFidObject(pIF);
     return 0;
 }
-
-
-
-
-
-
-
-
-
-

@@ -3,5 +3,5 @@ include_directories(${PROJECT_SOURCE_DIR}/src/include/)
 aux_source_directory(. MAIN_SRC)
 
 add_executable(SelectP ${MAIN_SRC})
-set(Lib_All ReadFile)
+set(Lib_All ReadFile IisfFid)
 target_link_libraries(SelectP ${Lib_All})

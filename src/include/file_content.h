@@ -23,6 +23,7 @@
 typedef struct Node {
     std::size_t mGroup; //the group of the data.
     std::size_t mFaultNum; //the fault number.
+    std::string mFilePath; //the path of the file.
 
     /**
      * Segment the date file to the n sampling fileds.
