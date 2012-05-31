@@ -220,7 +220,7 @@ void ReadUnwinForder(const std::string &forderPath, std::vector<std::string> &fi
 }
 #endif
 
-void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames)
+API void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames)
         throw (ParameterErrorException, ReadForderException)
 {
     if (forderPath.size() == 0) {
@@ -411,7 +411,7 @@ static inline std::size_t ReadOneGroup(std::ifstream &ifs, std::vector<double> &
 
 
 
-void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (ParameterErrorException, ReadContentException)
+API void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (ParameterErrorException, ReadContentException)
 {
     if(fileName.length() == 0)
     {

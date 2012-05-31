@@ -425,9 +425,6 @@ static void DiagnoseWithKnn(const DataType &faults,
             for (std::vector< std::vector<double> >::const_iterator vIt = ntIt->mValue.begin(); vIt != ntIt->mValue.end(); vIt++)
             {
                 std::size_t diagnoseResult = Knn(faults, key, trainingQuantity, *vIt);
-                std::cout << diagnoseResult << std::endl;
-                std::cout << faultNum2FaultName.find(diagnoseResult)->second << std::endl;
-                std::cout << dtIt->first << std::endl;
                 if (faultNum2FaultName.find(diagnoseResult)->second != dtIt->first)
                 {
                     state = false;
@@ -475,13 +472,15 @@ void IisfFidWithKnn::GetReducedPoint(const std::vector<AlphaType> &alphaWithPoin
 
         if (subFaultSet.size() == mFaults.size())
         {
+#if defined(DEBUG)
             std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
+#endif
             return;
         }
     }
-
+#if defined(DEBUG)
     std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
-
+#endif
     return;
 }
 
