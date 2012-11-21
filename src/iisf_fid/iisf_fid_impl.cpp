@@ -477,11 +477,13 @@ void IisfFidWithKnn::GetReducedPoint(const std::vector<AlphaType> &alphaWithPoin
 
         if (subFaultSet.size() == mFaults.size())
         {
+#if defined(DEBUG)
             std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
+#endif
             return;
         }
     }
-
+    
 #if defined(DEBUG)    
     std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
     for (std::set<std::string>::iterator it = subFaultSet.begin(); it != subFaultSet.end(); it++)
@@ -490,8 +492,6 @@ void IisfFidWithKnn::GetReducedPoint(const std::vector<AlphaType> &alphaWithPoin
     }
     std::cout << std::endl;
 #endif    
-    
-    return;
 }
 
 void IisfFidWithKnn::HandleData()
@@ -586,17 +586,3 @@ void IisfFidWithKnn::HandleData()
 #endif
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

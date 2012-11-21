@@ -231,7 +231,7 @@ void ReadUnwinForder(const std::string &forderPath, std::vector<std::string> &fi
 }
 #endif
 
-void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames)
+API void ReadForder(const std::string &forderPath, std::vector<std::string> &fileNames)
         throw (ParameterErrorException, ReadForderException)
 {
     if (forderPath.size() == 0) {
