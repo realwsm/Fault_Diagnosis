@@ -19,7 +19,8 @@
 
 const std::size_t READ_N_GROUP_DATA = 4;
 const std::size_t READ_COUNT_OF_PER_GROUP = 50;
-const std::size_t MIN_DATA_SIZE = 1000;
+//const std::size_t MIN_DATA_SIZE = 1000;
+const std::size_t MIN_DATA_SIZE = 500;
 
 API void GetFileName(const std::string &filePath, std::string &fileName) throw (ParameterErrorException)
 {
@@ -73,16 +74,26 @@ API void SplitFileName(const std::string &fileName, std::vector<std::string> &re
             break;
         }
         
+//        if ((cDataStr = std::strtok(0, "_")) == 0)
+//        {
+//            break;
+//        }
+//        
+//        if ((cDate = std::strtok(0, ".")) == 0)
+//        {
+//            break;
+//        }
+//
         if ((cDataStr = std::strtok(0, "_")) == 0)
         {
-            break;
+            cDataStr = "";
         }
         
         if ((cDate = std::strtok(0, ".")) == 0)
         {
-            break;
+            cDate = "";
         }
-
+        
         result.push_back(std::string(cFaultName));
         result.push_back(std::string(cGroupName));
         result.push_back(std::string(cPointName));
@@ -350,11 +361,12 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
 
     double tempData = 0.0;
     std::size_t dataCount = 0;
+    int filePos = ifs.tellg();
 
     /* skip the upper boundary */
     while (ifs >> tempData)
     {
-        if (tempData < (min + (difference * 0.15)))
+        if (tempData < (min + (difference * 0.08)))
         {
             dataCount++;
             break;
@@ -366,7 +378,7 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
     /* skip the lower boundary */
     while (ifs >> tempData)
     {
-        if (tempData > (max - (difference * 0.15)))
+        if (tempData > (max - (difference * 0.08)))
         {
             dataCount++;
             break;
@@ -379,7 +391,13 @@ static std::size_t JumpToBoundary(std::ifstream &ifs, const double min,
     /* reserve enough points for the next group.*/
     if (dataCount > maxReadSize)
     {
-        throw ReadContentException();
+        //throw ReadContentException();
+        dataCount = 0;
+        if (!ifs.good())
+        {
+            ifs.clear();
+        }
+        ifs.seekg(filePos, std::ios::beg);
     }
     
     return dataCount;
@@ -408,8 +426,6 @@ static inline std::size_t ReadOneGroup(std::ifstream &ifs, std::vector<double> &
     
     return count;
 }
-
-
 
 void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (ParameterErrorException, ReadContentException)
 {
@@ -454,7 +470,6 @@ void GetNodeContent(const std::string &fileName, NodeType &nodeContent) throw (P
         double min = 0.0, max = 0.0;
 
         FindMaxAndMIN(ifs, fullDataSize, min, max);
-
 
         for (std::size_t i = 0; i < READ_N_GROUP_DATA; i++)
         {

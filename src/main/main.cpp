@@ -16,12 +16,13 @@ int main() {
     //newconfig.printnewcontent();
     //std::string path("/home/w/data");
 
-    std::string path("/media/share/tmp/data/");
-  
+    //std::string path("/media/share/tmp/data/");
+    std::string path("/media/share/tmp/data1/");
+
+    std::cout << "file path: " << path << std::endl;
     newconfig->readforder(path);
     newconfig->printallfordername();
-    newconfig->fillnodes();
-    //newconfig->printnewcontent();
+    newconfig->fillnodes();    //newconfig->printnewcontent();
 
     destroyfillcontentobject(newconfig);
 #endif
@@ -50,7 +51,9 @@ int main() {
     }
 #endif    
     IisfFid * pIF = CreatIisfFidObject();
-    pIF->ReadData("/media/share/tmp/data/");
+    //pIF->ReadData("/media/share/tmp/data/");
+    //pIF->ReadData("/media/share/tmp/data1/");
+    pIF->ReadData("/media/share/tmp/data2/");
     pIF->HandleData();
     DestoryIisfFidObject(pIF);
     return 0;

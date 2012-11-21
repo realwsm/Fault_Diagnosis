@@ -410,7 +410,7 @@ static void DiagnoseWithKnn(const DataType &faults,
                             const std::string &key,
                             std::vector<std::string> &pointFaults)
 {
-    std::size_t trainingQuantity = (faults.begin()->second.begin()->second.size() + 1) / 2;
+    std::size_t trainingQuantity = ((faults.begin()->second.begin()->second.size() + 1) / 5) * 4;
     PointType::const_iterator ptIt;
 
     for (DataType::const_iterator dtIt = faults.begin(); dtIt != faults.end(); dtIt++)
@@ -425,9 +425,11 @@ static void DiagnoseWithKnn(const DataType &faults,
             for (std::vector< std::vector<double> >::const_iterator vIt = ntIt->mValue.begin(); vIt != ntIt->mValue.end(); vIt++)
             {
                 std::size_t diagnoseResult = Knn(faults, key, trainingQuantity, *vIt);
+#if 0
                 std::cout << diagnoseResult << std::endl;
                 std::cout << faultNum2FaultName.find(diagnoseResult)->second << std::endl;
                 std::cout << dtIt->first << std::endl;
+#endif
                 if (faultNum2FaultName.find(diagnoseResult)->second != dtIt->first)
                 {
                     state = false;
@@ -480,8 +482,15 @@ void IisfFidWithKnn::GetReducedPoint(const std::vector<AlphaType> &alphaWithPoin
         }
     }
 
+#if defined(DEBUG)    
     std::cout << "subFaultSet size: " << subFaultSet.size() << std::endl;
-
+    for (std::set<std::string>::iterator it = subFaultSet.begin(); it != subFaultSet.end(); it++)
+    {
+        std::cout << *it << '|';
+    }
+    std::cout << std::endl;
+#endif    
+    
     return;
 }
 
@@ -505,16 +514,17 @@ void IisfFidWithKnn::HandleData()
     GetReducedPoint(resultAlphaWithPoint, N);
     
 #if defined(DEBUG)
-#if 0
+
     std::cout << "fault size: " << mFaults.size() << std::endl;
     std::cout << "point size: " << mFaults.begin()->second.size() << std::endl;
     std::cout << "list size: " << mFaults.begin()->second.begin()->second.size() << std::endl;
     std::cout << "instance size: " << mFaults.begin()->second.begin()->second.begin()->mValue.size() << std::endl;
     std::cout << "fault name: " << mFaults.begin()->first << std::endl;
-#endif
+
 #if 0
     std::cout << resultAlpha.size() << std::endl;
 #endif
+
     std::cout << "----------mFaults------------" << std::endl;
     for (DataType::iterator it = mFaults.begin(); it != mFaults.end(); it++)
     {
